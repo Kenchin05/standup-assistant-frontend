@@ -24,28 +24,30 @@ export default function TeamMembers() {
     fetchMembers();
   }, []);
 
-  if (!members.length) {
+  if (!members.length)
     return (
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <p className="text-gray-500">No members found.</p>
-      </div>
+      <p className="text-sm text-black text-center py-4">
+        No team members yet.
+      </p>
     );
-  }
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
-      <h2 className="text-lg font-semibold mb-3">Team Members</h2>
-      <ul className="space-y-2">
-        {members.map((m) => (
-          <li
-            key={m._id}
-            className="flex justify-between border-b pb-1 text-sm text-gray-700"
-          >
-            <span>{m.name}</span>
-            <span className="text-gray-500">{m.email}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+   return (
+    <ul className="divide-y divide-gray-200">
+      {members.map((m) => (
+        <li
+          key={m._id}
+          className="flex justify-between items-center py-3 hover:bg-gray-50 transition rounded-md px-3"
+        >
+          <div>
+            <p className="text-sm font-medium text-black">
+              {m.name}
+            </p>
+            <p className="text-xs text-gray-500">
+              {m.email}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }

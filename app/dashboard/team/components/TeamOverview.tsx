@@ -30,7 +30,7 @@ export default function TeamOverview() {
   const copyCode = async () => {
     if (!team?.code) return;
     await navigator.clipboard.writeText(team.code);
-    setCopied(true);
+    setCopied(true);  
     toast.success("Copied join code!");
     setTimeout(() => setCopied(false), 2000);
   };
@@ -43,32 +43,42 @@ export default function TeamOverview() {
     );
   }
 
+  
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md space-y-3">
-      <h2 className="text-xl font-semibold text-gray-800">
-        Team: {team.name}
-      </h2>
-      <p className="text-sm text-gray-600">
-        Created on: {new Date(team.createdAt).toLocaleDateString()}
-      </p>
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold text-black">
+          Team: {team.name}
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Created on:{" "}
+          {new Date(team.createdAt).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </p>
+      </div>
 
-      <div className="mt-4 flex items-center justify-between bg-gray-100 p-3 rounded-lg">
+      <div className="flex items-center justify-between bg-gray-100 px-4 py-3 rounded-md border border-gray-100">
         <div>
-          <p className="text-sm text-gray-700">
-            <b>Join Code:</b> {team.code}
-          </p>
-          <p className="text-xs text-gray-500">
-            Share this code with teammates to join your team
-          </p>
+          <p className="text-xs text-gray-500 mb-1">Join Code</p>
+          <span className="font-mono text-sm text-gray-800">
+            {team.code}
+          </span>
         </div>
         <button
           onClick={copyCode}
-          className="flex items-center bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700"
+          className="text-blue-600 text-sm font-medium hover:text-blue-800"
         >
-          <Copy size={16} className="mr-1" />
-          {copied ? "Copied!" : "Copy"}
+          <Copy size={14} className="inline mr-1" />
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
+
+      <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+        Share this code with teammates to join your team.
+      </p>
     </div>
   );
 }

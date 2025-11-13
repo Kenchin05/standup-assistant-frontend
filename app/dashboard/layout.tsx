@@ -2,15 +2,22 @@
 import { useAuthStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { LogOut } from "lucide-react";
+import Sidebar from "./components/Sidebar";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { token, setAuth, clearAuth } = useAuthStore();
+  const { token, setAuth } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -19,37 +26,18 @@ export default function DashboardLayout({
       return;
     }
     if (!token) {
-      // rehydrate store from localStorage
       setAuth(null, savedToken);
     }
   }, [token]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <nav className="flex justify-between items-center px-6 py-4 bg-white shadow">
-        <div className="flex items-center gap-6">
-    <h1
-      onClick={() => router.push("/dashboard")}
-      className="font-bold text-lg text-blue-600 cursor-pointer"
-    >
-      AI Standup Assistant
-    </h1>
-    <button
-      onClick={() => router.push("/dashboard/team")}
-      className="text-gray-700 hover:text-blue-600"
-    >
-      Team
-    </button>
-    <button
-  onClick={() => router.push("/dashboard/history")}
-  className="text-gray-700 hover:text-blue-600"
->
-  History
-</button>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
 
-  </div>
-      </nav>
-      <main className="flex-1 p-6 flex justify-center">{children}</main>
+     <main className="flex-1 bg-gray-50 overflow-y-auto">
+  <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">{children}</div>
+</main>
+
     </div>
   );
 }

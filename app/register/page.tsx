@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import axiosClient from "@/lib/axiosClient";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -12,10 +14,10 @@ export default function RegisterPage() {
   });
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await axiosClient.post("/auth/register", form);
@@ -28,9 +30,10 @@ export default function RegisterPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <Card>
       <form
         onSubmit={handleRegister}
-        className="bg-white p-8 rounded-xl shadow-md w-96"
+        className="p-8 w-96"
       >
         <h2 className="text-2xl font-semibold mb-6 text-center text-black">Register</h2>
         <input
@@ -60,19 +63,17 @@ export default function RegisterPage() {
           className="w-full p-2 mb-6 border rounded text-black"
           required
         />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-        >
+        <Button type="submit" className="w-full">
           Create Account
-        </button>
-        <p className="text-center text-sm mt-4 text-black">
+        </Button>
+        <p className="text-center text-sm mt-4 text-gray-600">
           Already have an account?{" "}
           <a href="/login" className="text-blue-600 hover:underline">
             Login
           </a>
         </p>
       </form>
+      </Card>
     </div>
   );
 }

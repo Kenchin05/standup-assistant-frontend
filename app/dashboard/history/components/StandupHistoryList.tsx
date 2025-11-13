@@ -40,7 +40,6 @@ export default function StandupHistoryList() {
     fetchHistory();
   }, []);
 
-  // Handle Delete
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this standup?")) return;
     try {
@@ -52,7 +51,6 @@ export default function StandupHistoryList() {
     }
   };
 
-  // Handle Edit (redirect to dashboard prefilled)
   const handleEdit = (standup: Standup) => {
     const todayStr = new Date().toDateString();
     const standupDate = new Date(standup.date).toDateString();
@@ -71,14 +69,14 @@ export default function StandupHistoryList() {
   if (loading)
     return (
       <div className="bg-white p-6 rounded-xl shadow text-center">
-        <p className="animate-pulse text-gray-500">Loading history...</p>
+        <p className="animate-pulse text-gray-700">Loading history...</p>
       </div>
     );
 
   if (!standups.length)
     return (
       <div className="bg-white p-6 rounded-xl shadow text-center">
-        <p className="text-gray-500">No standup entries yet.</p>
+        <p className="text-gray-700">No standup entries yet.</p>
       </div>
     );
 
@@ -89,18 +87,18 @@ export default function StandupHistoryList() {
       {standups.map((s) => (
         <div
           key={s._id}
-          className="bg-white p-5 rounded-xl shadow hover:shadow-md transition"
+          className="bg-white p-5 rounded-xl shadow-sm hover:shadow transition border border-gray-100"
         >
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <h3 className="text-gray-800 font-medium">
+              <h2 className="text-gray-700 font-medium">
                 {new Date(s.date).toLocaleDateString("en-IN", {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
                 })}
-              </h3>
-              <p className="text-xs text-gray-500">
+              </h2>
+              <p className="text-xs text-gray-600">
                 Last updated:{" "}
                 {s.updatedAt
                   ? new Date(s.updatedAt).toLocaleTimeString()
@@ -124,41 +122,45 @@ export default function StandupHistoryList() {
             </div>
           </div>
 
-          <div className="text-sm text-gray-700 space-y-1">
-            <p>
-              <b>Yesterday:</b> {s.yesterday || "—"}
+          <div className="text-sm space-y-2 text-gray-800">
+            <p className="text-gray-700"  >
+              <span className="font-medium text-gray-900">Yesterday:</span> {s.yesterday || "—"}
             </p>
-            <p>
-              <b>Today:</b> {s.today || "—"}
+            <p className="text-gray-700">
+              <span className="font-medium text-gray-900">Today:</span> {s.today || "—"}
             </p>
             {s.blockers && (
-              <p>
-                <b>Blockers:</b> {s.blockers}
+              <p className="text-gray-700">
+                <span className="font-medium text-gray-900">Blockers:</span> {s.blockers}
               </p>
             )}
           </div>
 
           {s.aiFeedback && (
-            <div className="mt-3 border-t pt-3 text-sm text-gray-600">
-              <p>
-                <b>Tone:</b>{" "}
+            <div className="mt-3 border-t border-gray-100 pt-3 text-sm text-gray-700">
+              <p className="mb-1">
+                <span className="font-medium text-gray-900">Tone:</span>{" "}
                 <span
-                  className={`${
+                  className={`font-medium ${
                     s.aiFeedback.tone === "frustrated"
                       ? "text-red-600"
                       : s.aiFeedback.tone === "positive"
                       ? "text-green-600"
-                      : "text-gray-700"
+                      : "text-blue-600"
                   }`}
                 >
-                  {s.aiFeedback.tone}
+                  {s.aiFeedback.tone.charAt(0).toUpperCase() + s.aiFeedback.tone.slice(1)}
                 </span>
               </p>
-              <p>
-                <b>Vagueness:</b> {s.aiFeedback.vague_score}/10
+              <p className="mb-1 ">
+                <span className="font-medium text-gray-900">Vagueness:</span>{" "}
+                <span className="font-medium text-gray-700    ">
+                  {s.aiFeedback.vague_score}/10
+                </span>
               </p>
-              <p>
-                <b>Suggestion:</b> {s.aiFeedback.suggestion}
+              <p className="text-gray-900">
+                <span className="font-medium text-gray-900">Suggestion:</span>{" "}
+                <span className="italic text-gray-700">{s.aiFeedback.suggestion}</span>
               </p>
             </div>
           )}

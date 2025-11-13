@@ -1,20 +1,22 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
 
-export const metadata = {
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
   title: "AI Standup Assistant",
-  description: "Automated daily standups with AI insights",
+  description: "AI-powered daily standup assistant for teams",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 text-gray-900 min-h-screen">
-        <Toaster position="top-right" />
+      <body className={`${inter.className} bg-gray-50`}>
         {children}
       </body>
     </html>

@@ -30,44 +30,67 @@ export default function TeamSummaryCard() {
 
   if (loading) {
     return (
-      <div className="bg-white shadow-md p-6 rounded-2xl w-full text-center">
-        <p className="text-gray-500 animate-pulse">Loading team summary...</p>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-100 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-100 rounded w-full"></div>
+          <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+          <div className="h-4 bg-gray-100 rounded w-4/6"></div>
+        </div>
       </div>
     );
   }
 
   if (!summary) {
     return (
-      <div className="bg-white shadow-md p-6 rounded-2xl w-full text-center">
-        <p className="text-gray-500">No team summary available yet.</p>
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p className="text-gray-700">No team summary available yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white shadow-md p-6 rounded-2xl w-full mt-6">
-      <h2 className="text-xl font-semibold mb-3 text-black">
-        Team Summary (AI)
-      </h2>
-      <p className="mb-4 text-gray-700">{summary.summary}</p>
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Team Insights</h2>
+      
+      <div className="space-y-5">
+        <div>
+          <h3 className="font-medium text-gray-800">Summary</h3>
+          <p className="text-gray-700 mt-1.5 leading-relaxed">{summary.summary}</p>
+        </div>
 
-      <div className="space-y-2 text-sm text-gray-700">
-        <p>
-          <b className="text-black font-bold">Common Blockers:</b>{" "}
-          {summary.common_blockers.length
-            ? summary.common_blockers.join(", ")
-            : "None"}
-        </p>
-        <p>
-          <b className="text-black font-bold">Collaborations:</b>{" "}
-          {summary.suggested_collaborations.length
-            ? summary.suggested_collaborations.join(", ")
-            : "None"}
-        </p>
-        <p>
-          <b className="text-black font-bold">Risks:</b>{" "}
-          {summary.risks.length ? summary.risks.join(", ") : "None"}
-        </p>
+        {summary.common_blockers && summary.common_blockers.length > 0 && (
+          <div>
+            <h3 className="font-medium text-gray-800">Common Blockers</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1.5 mt-1.5 pl-1">
+              {summary.common_blockers.map((blocker, index) => (
+                <li key={index} className="leading-relaxed">{blocker}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {summary.suggested_collaborations && summary.suggested_collaborations.length > 0 && (
+          <div>
+            <h3 className="font-medium text-gray-800">Collaboration Opportunities</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1.5 mt-1.5 pl-1">
+              {summary.suggested_collaborations.map((collab, index) => (
+                <li key={index} className="leading-relaxed">{collab}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {summary.risks && summary.risks.length > 0 && (
+          <div>
+            <h3 className="font-medium text-gray-800">Potential Risks</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1.5 mt-1.5 pl-1">
+              {summary.risks.map((risk, index) => (
+                <li key={index} className="leading-relaxed">{risk}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
