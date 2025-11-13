@@ -1,23 +1,61 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axiosClient from "@/lib/axiosClient";
 import toast from "react-hot-toast";
 
-interface Feedback {
-  key_tasks: string[];
-  tone: string;
-  vague_score: number;
-  suggestion: string;
+interface Standup {
+  _id?: string;
+  yesterday: string;
+  today: string;
+  blockers: string;
+  aiFeedback?: {
+    tone: string;
+    vague_score: number;
+    suggestion: string;
+  };
+  updatedAt?: string;
 }
 
 export default function StandupForm() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Standup>({
     yesterday: "",
     today: "",
     blockers: "",
   });
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [hasEntry, setHasEntry] = useState(false);
+
+  // Fetch today's standup on mount
+  useEffect(() => {
+    const editData = localStorage.getItem("editStandup");
+  if (editData) {
+    const parsed = JSON.parse(editData);
+    setForm(parsed);
+    setEditing(true);
+    setHasEntry(true);
+    localStorage.removeItem("editStandup");
+  } else {
+    const fetchToday = async () => {
+      try {
+        const res = await axiosClient.get("/standup/me");
+        const today = new Date().toDateString();
+        const todayEntry = res.data.find(
+          (s: any) => new Date(s.date).toDateString() === today
+        );
+        if (todayEntry) {
+          setForm(todayEntry);
+          setHasEntry(true);
+        }
+      } catch {
+        toast.error("Couldn't load today's standup");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchToday();
+  }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,76 +63,122 @@ export default function StandupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      const res = await axiosClient.post("/standup", form);
-      setFeedback(res.data.standup.aiFeedback);
-      toast.success("Standup submitted!");
-    } catch (err) {
-      toast.error("Failed to submit standup");
-    } finally {
-      setLoading(false);
+      if (hasEntry && editing) {
+        await axiosClient.put("/standup/update", form);
+        toast.success("Standup updated!");
+      } else {
+        await axiosClient.post("/standup", form);
+        toast.success("Standup submitted!");
+        setHasEntry(true);
+      }
+      setEditing(false);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Error saving standup");
     }
   };
 
-  return (
-    <div className="bg-white shadow-md p-6 rounded-2xl w-full">
-      <h2 className="text-xl font-semibold mb-4 text-black">
-        Submit Your Daily Standup
-      </h2>
+  if (loading)
+    return (
+      <div className="bg-white p-6 rounded-xl shadow text-center">
+        <p className="animate-pulse text-gray-500">Loading...</p>
+      </div>
+    );
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {["yesterday", "today", "blockers"].map((field) => (
-          <div key={field}>
-            <label
-              htmlFor={field}
-              className="block text-sm font-medium text-black mb-1 capitalize"
-            >
-              {field}
-            </label>
-            <textarea
-              name={field}
-              id={field}
-              value={(form as any)[field]}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-2 text-black focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder={`What did you do ${field}?`}
-              required={field !== "blockers"}
-              rows={field === "blockers" ? 2 : 3}
-            />
-          </div>
-        ))}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          {loading ? "Submitting..." : "Submit Standup"}
-        </button>
-      </form>
-
-      {feedback && (
-        <div className="mt-6 border-t pt-4">
-          <h3 className="text-lg font-semibold mb-2 text-black-800">
-            AI Feedback
-          </h3>
-          <p>
-            <b>Key Tasks:</b>{" "}
-            {feedback.key_tasks.length > 0
-              ? feedback.key_tasks.join(", ")
-              : "No tasks extracted"}
-          </p>
-          <p>
-            <b>Tone:</b> {feedback.tone}
-          </p>
-          <p>
-            <b>Vagueness Score:</b> {feedback.vague_score}/10
-          </p>
-          <p>
-            <b>Suggestion:</b> {feedback.suggestion}
-          </p>
+  // Read-only mode
+  if (hasEntry && !editing) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Today’s Standup Summary
+          </h2>
+          <button
+            onClick={() => setEditing(true)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Edit
+          </button>
         </div>
-      )}
-    </div>
+
+        <p>
+          <b>Yesterday:</b> {form.yesterday || "—"}
+        </p>
+        <p>
+          <b>Today:</b> {form.today || "—"}
+        </p>
+        <p>
+          <b>Blockers:</b> {form.blockers || "None"}
+        </p>
+
+        {form.aiFeedback && (
+          <div className="mt-2 text-sm text-gray-700 border-t pt-2">
+            <p>
+              <b>Tone:</b> {form.aiFeedback.tone}
+            </p>
+            <p>
+              <b>Vagueness Score:</b> {form.aiFeedback.vague_score}/10
+            </p>
+            <p>
+              <b>Suggestion:</b> {form.aiFeedback.suggestion}
+            </p>
+          </div>
+        )}
+
+        {form.updatedAt && (
+          <p className="text-xs text-gray-400 italic mt-2">
+            Last updated: {new Date(form.updatedAt).toLocaleTimeString()}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // 🧩 Editable mode
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow space-y-4"
+    >
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-gray-800">
+          {hasEntry ? "Edit Standup" : "Submit Standup"}
+        </h2>
+        {hasEntry && (
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            ✖ Cancel
+          </button>
+        )}
+      </div>
+
+      {["yesterday", "today", "blockers"].map((field) => (
+        <div key={field}>
+          <label className="block text-sm text-gray-600 capitalize mb-1">
+            {field}
+          </label>
+          <textarea
+            name={field}
+            value={(form as any)[field]}
+            onChange={handleChange}
+            placeholder={`What did you do ${field}?`}
+            className="w-full border rounded-lg p-2 h-20"
+          />
+        </div>
+      ))}
+
+      <button
+        type="submit"
+        className={`w-full py-2 rounded text-white transition ${
+          hasEntry
+            ? "bg-yellow-600 hover:bg-yellow-700"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
+      >
+        {hasEntry ? "Update Standup" : "Submit Standup"}
+      </button>
+    </form>
   );
 }

@@ -40,6 +40,13 @@ export default function DashboardLayout({
     >
       Team
     </button>
+    <button
+  onClick={() => router.push("/dashboard/history")}
+  className="text-gray-700 hover:text-blue-600"
+>
+  History
+</button>
+
   </div>
       </nav>
       <main className="flex-1 p-6 flex justify-center">{children}</main>
