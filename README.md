@@ -140,13 +140,18 @@ Follows the theme of minimal, clean data representation.
 
 # Screenshots
 
-Add your own screenshots:
+## Main Dashboard
+<img width="1860" height="938" alt="image" src="https://github.com/user-attachments/assets/4fae0a88-6aab-4a8a-9fea-41e6497fea95" />
 
-```
-/public/screens/dashboard.png
-/public/screens/history.png
-/public/screens/insights.png
-```
+## Team Management
+<img width="1862" height="942" alt="image" src="https://github.com/user-attachments/assets/9a4ec1dd-ab20-4914-bd7b-7446b8fb820b" />
+
+## History of standups
+<img width="1862" height="943" alt="image" src="https://github.com/user-attachments/assets/8411b3e4-713e-4efb-b95e-3dc39ab5ea2c" />
+
+## Visual Insights
+<img width="1861" height="942" alt="image" src="https://github.com/user-attachments/assets/33e57718-5412-46e1-8adf-15f23e55611e" />
+
 
 
 ---
